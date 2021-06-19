@@ -19,17 +19,8 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        /* $data = Transaction::get(); */
-        /* $data = auth()->user()->transactions()->purchasedProducts()->get(); */
-        /* $data = User::with('purchasedProducts','transactions')->get(); */
-        /* d = DB::table('select * from transactions t LEFT OUTER JOIN orders o on transaction_id = o.transaction_id 
-        LEFT OUTER JOIN products p on id = p.id WHERE user_id = 1')->get(); */
-        /* $d = User::with('orders')->get(); */
-        /*  $d = $data->orders()->get(); */
         $uid = auth()->user()->id;
         $data = User::with('transactions.orders.products')->where('id', $uid)->get();
-        /* $data = User::with('transactions')->where('id', $uid)->get(); */
-        /* $data = auth()->user()->with('transactions.orders.products')->get(); */
         return response()->json($data);
     }
 
@@ -45,9 +36,11 @@ class TransactionController extends Controller
             'amount' => 'required',
             'payment_method' => 'required|string',
         ]);
+
+
         DB::transaction(function () use ($request) {
             $transaction = auth()->user()->transactions()->create([
-                'transaction_id' => auth()->user()->id . '' . strtotime(date('Y:m:d h:m:s')),
+                'transaction_id' => $request->transaction_id,
                 'products' => $request->cart,
                 'payment_method' => $request->payment_method,
                 'amount' => $request->amount,
@@ -72,27 +65,9 @@ class TransactionController extends Controller
                     ], 401);
                 }
             };
-            /* $order = auth()->user()->orders()->create($ord); */
-
-            /* $order = auth()->user()->orders()->create([
-                 'transaction_id' => $transaction->transaction_id,
-                'product_id' => $request->cart->id,
-                $request->cart
-            ]); */
         });
 
 
-
-        /* $transaction = new Transaction();
-
-        $transaction->user_id = auth()->user()->id;
-        
-        $transaction->transaction_id = auth()->user()->id.''.strtotime(date('Y:m:d h:m:s'));
-        $transaction->products = serialize($request->cart);
-        $transaction->payment_method = $request->payment_method;
-        $transaction->amount = $request->amount;
-        $transaction->status = 'placed';
-        $transaction->save(); */
 
         return response()->json(['message' => 'Order successfuly placed']);
     }
@@ -100,7 +75,14 @@ class TransactionController extends Controller
     public function checkOrderStatus($orderNumber){
         $order = Transaction::where('transaction_id' , $orderNumber)->first();
 
-        return response()->json($order);
+        if ($order) {
+            return response()->json($order);
+        } else {
+            return response()->json('Not Found');
+        }
+        
+
+        
 
     }
 

@@ -48,6 +48,31 @@ class UserController extends Controller
         return response()->json('Password Changed');
     }
 
+
+    //Reset Password
+    public function forgotpassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|min:2|email',
+        ]);
+
+        $found = User::where('email', $request->email)->first();
+
+        $bytes = random_bytes(5);
+        if ($found) {
+            $found->password = Hash::make(bin2hex($bytes));
+            $found->update();
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'error',
+                'errors' => ['Invalid Credentials'],
+            ], 401);
+        }
+        
+        return response()->json('A new password has been sent to your Email');
+    }
+
     /**
      * Show the form for creating a new resource.
      *

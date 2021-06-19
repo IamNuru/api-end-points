@@ -8,7 +8,8 @@ use App\Http\Controllers\CategoryController;
 use \App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TransactionController;
-
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +27,7 @@ Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 Route::get('products', [ProductController::class, 'index']);
 Route::get('product/{id}', [ProductController::class, 'show']);
-Route::get('related/products/{categoryId}', [ProductController::class, 'relatedProducts']);
+Route::get('related/products/{id}', [ProductController::class, 'relatedProducts']);
 Route::get('address/{id}', [AddressController::class, 'show']);
 Route::get('categories', [CategoryController::class, 'index']);
 Route::get('category/{id}', [CategoryController::class, 'show']);
@@ -35,6 +36,9 @@ Route::get('products/homepage/{catName}', [ProductController::class, 'homepagePr
 Route::get('category/products/{id}', [ProductController::class, 'categoryProducts']);
 Route::get('search', [ProductController::class, 'search']);
 Route::get('checkorderstatus/{orderNumber}', [TransactionController::class, 'checkOrderStatus']);
+Route::get('cart/items/{cart}', [ProductController::class, 'cartItems']);
+Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail']);
+Route::post('password/reset', [ResetPasswordController::class, 'reset']);
 
 
 

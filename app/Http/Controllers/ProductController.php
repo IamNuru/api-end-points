@@ -10,24 +10,24 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
     //search item
-    public function search(Request $request){
+    public function search(Request $request)
+    {
         $text = $request->input('text');
-        $data = Product::where('title', 'like', '%'.$text.'%')
-        ->orWhere('description', 'like', '%'.$text.'%')
-        ->latest()
-        ->get();
+        $data = Product::where('title', 'like', '%' . $text . '%')
+            ->orWhere('description', 'like', '%' . $text . '%')
+            ->latest()
+            ->get();
 
         return response()->json($data);
-
     }
 
     //fetch all products
     public function index()
     {
         $data = Product::with('category')
-        ->where('qty', '>', 0)
-        ->latest()
-        ->get();
+            ->where('qty', '>', 0)
+            ->latest()
+            ->get();
 
         return response()->json($data);
     }
@@ -55,10 +55,10 @@ class ProductController extends Controller
     public function categoryProducts($id)
     {
         $data = Product::where('category_id', $id)
-        ->where('qty', '>', 0)
-        ->limit(6)
-        ->latest()
-        ->get();
+            ->where('qty', '>', 0)
+            ->limit(6)
+            ->latest()
+            ->get();
 
         return response()->json($data);
     }
@@ -69,8 +69,9 @@ class ProductController extends Controller
         $limit = $request->input('limit', 6);
         $first = Product::where('id', $id)->first();
         $data = Product::where('category_id', $first->category_id)
-        ->limit($limit)
-        ->get();
+            ->where('id', '!=', $id)
+            ->limit($limit)
+            ->get();
 
         return response()->json($data);
     }
@@ -111,7 +112,7 @@ class ProductController extends Controller
             $filenameToStore = 'noimage.jpg';
         }
         $product = new Product();
-        $product->category_id = 1;
+        $product->category_id = $request->category;
         $product->title = $request->title;
         $product->slug =  Str::slug($request->title);
         $product->price = $request->price;
@@ -199,5 +200,25 @@ class ProductController extends Controller
     {
         $product = Product::destroy($id);
         return response()->json(['message' => 'Product Deleted Successfully']);
+    }
+
+    /**
+     * 
+     * get cart items
+     */
+    public function cartItems(Request $request, $cart)
+    {
+        $ids = $request->input('ids');
+        $aa = array_map('intval', explode(',', $ids));
+        $cartItems = Product::whereIn('id', $aa)->get();
+
+        /* foreach ($cart as $cat) {
+            if ($cat->price != ) {
+                # code...
+            }
+        } */
+
+
+        return response()->json($cartItems);
     }
 }
