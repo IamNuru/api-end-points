@@ -53,16 +53,24 @@ class TransactionController extends Controller
                     'product_id' => $item['id'],
                     'qty' => $item['qty'],
                 ));
-                $product = Product::find($item['id']);
-                if ($product->qty > $item['qty']) {
-                    $product->qty = $product->qty - $item['qty'];
-                    $product->update();
-                }else{
+                $product = Product::findOrFail($item['id']);
+                if ($product->price != ($item['price'] / $item['qty'])) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'error',
-                        'errors' => ['Quantity requested is not available'],
+                        'errors' => ["Something went wrong, Your Order couldn't go through"],
                     ], 401);
+                } else {
+                    if ($product->qty > $item['qty']) {
+                        $product->qty = $product->qty - $item['qty'];
+                        $product->update();
+                    } else {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'error',
+                            'errors' => ['Quantity requested is not available'],
+                        ], 401);
+                    }
                 }
             };
         });
@@ -72,18 +80,15 @@ class TransactionController extends Controller
         return response()->json(['message' => 'Order successfuly placed']);
     }
 
-    public function checkOrderStatus($orderNumber){
-        $order = Transaction::where('transaction_id' , $orderNumber)->first();
+    public function checkOrderStatus($orderNumber)
+    {
+        $order = Transaction::where('transaction_id', $orderNumber)->first();
 
         if ($order) {
             return response()->json($order);
         } else {
             return response()->json('Not Found');
         }
-        
-
-        
-
     }
 
 

@@ -10,6 +10,12 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\TodoController;
+use App\Http\Controllers\TodolistController;
+use App\Models\Todo;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +45,40 @@ Route::get('checkorderstatus/{orderNumber}', [TransactionController::class, 'che
 Route::get('cart/items/{cart}', [ProductController::class, 'cartItems']);
 Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 Route::post('password/reset', [ResetPasswordController::class, 'reset']);
+
+
+/**
+ * the following routes are todos routes
+ * 
+ * START
+ */
+Route::prefix('todo')->group(function () {
+    Route::post('login/user', [OwnerController::class, 'check']);
+    Route::post('register/user', [OwnerController::class, 'store']);
+    Route::post('user/{id}', [OwnerController::class, 'update']);
+    //Todo Items
+    Route::get('todos/{id}', [TodoController::class, 'todos']);
+    Route::get('todo/{id}', [TodoController::class, 'show']);
+    Route::delete('todo/{id}', [TodoController::class, 'destroy']);
+    Route::post('additem/{id}', [TodoController::class, 'store']);
+    Route::post('updatetodo/{id}', [TodoController::class, 'update']);
+    Route::post('updatestatus/{id}', [TodoController::class, 'updatestatus']);
+    //todolists
+    Route::get('todolists/{id}', [TodolistController::class, 'todolists']);
+    Route::get('todolist/{id}', [TodolistController::class, 'show']);
+    Route::delete('todolist/{id}', [TodolistController::class, 'destroy']);
+    Route::post('addtodolist', [TodolistController::class, 'store']);
+    Route::post('updatetodolist/{id}', [TodolistController::class, 'update']);
+});
+
+/**
+ * END TODO ROUTES
+ */
+
+
+
+
+
 
 
 
