@@ -11,7 +11,8 @@ class TodoController extends Controller
 
     //get all todos
     public function todos($id){
-        $todos = Todo::with('todolist')->where('todolist_id', $id)->get();
+        $todos = Todo::with('todolist')->where('todolist_id', $id)
+        ->latest()->get();
 
         return response()->json($todos);
     }
@@ -30,17 +31,18 @@ class TodoController extends Controller
     //store todo item to database
     public function store(Request $request, $id){
         $request->validate([
-            'title' => 'required|string|min:2|max:20',
+            'title' => 'required|string|min:2|max:50',
             'deadline' => 'nullable|date|after_or_equal:today',
         ]);
         $confirmTodolist = Todolist::find($id);
         if(!$confirmTodolist){
             return response()->json(['message'=>"We couldn't find related todolist"]);
         }
+        $today = date("Y-m-d");
         $todo = new Todo();
         $todo->todolist_id = $id;
         $todo->title = $request->title;
-        $todo->deadline = $request->deadline;
+        $todo->deadline = $request->deadline ? $request->deadline : $today;
         $todo->save();
 
         return response()->json(['message'=>'Todo Item succesfully Added', 'data' => $todo]);
@@ -50,17 +52,18 @@ class TodoController extends Controller
     //update todo item to database
     public function update(Request $request, $id){
         $request->validate([
-            'title' => 'required|string|min:2|max:20',
+            'title' => 'required|string|min:2|max:50',
             'deadline' => 'nullable|date|after_or_equal:today',
             'todolist' => 'required|integer'
         ],[
             'todolist.required' => 'Please select a todolist',
             'todolist.integer' => 'Invalid todolist selected',
         ]);
+        $today = date("Y-m-d");
         $todo = Todo::where('id', $id)->first();
         $todo->todolist_id = $request->todolist;
         $todo->title = $request->title;
-        $todo->deadline = $request->deadline;
+        $todo->deadline = $request->deadline ? $request->deadline : $today;
         $todo->update();
 
         return response()->json(['message' =>'Todo Item succesfully Updated', 'data' => $todo]);

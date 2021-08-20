@@ -10,7 +10,8 @@ class TodolistController extends Controller
 {
     //get all todolists
     public function todolists($id){
-        $todos = Todolist::with('todos')->where('owner_id', $id)->get();
+        $todos = Todolist::with('todos')->where('owner_id', $id)
+        ->latest()->get();
 
         return response()->json($todos);
     }

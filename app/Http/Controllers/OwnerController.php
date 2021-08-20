@@ -25,8 +25,9 @@ class OwnerController extends Controller
 
 
     //update todo owner
-    public function update(Request $request){
+    public function resetpassword(Request $request){
         $request->validate([
+            'username' => 'required',
             'password' => 'required|string|min:3|max:12'
         ]);
         $owner = Owner::where('username', $request->username)->first();
@@ -35,7 +36,11 @@ class OwnerController extends Controller
             $owner->update();
             return response()->json(['message' => 'Update successful', 'data' =>$owner]);
         }else{
-            return response()->json(['message' => 'Sorry, the username does not match our records']);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'error',
+                'errors' => ['Invalid Credentials'],
+            ], 401);
         };
     }
 

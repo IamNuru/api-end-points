@@ -13,7 +13,6 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\TodolistController;
-use App\Models\Todo;
 
 
 
@@ -56,6 +55,7 @@ Route::prefix('todo')->group(function () {
     Route::post('login/user', [OwnerController::class, 'check']);
     Route::post('register/user', [OwnerController::class, 'store']);
     Route::post('user/{id}', [OwnerController::class, 'update']);
+    Route::post('resetpassword/user', [OwnerController::class, 'resetpassword']);
     //Todo Items
     Route::get('todos/{id}', [TodoController::class, 'todos']);
     Route::get('todo/{id}', [TodoController::class, 'show']);
